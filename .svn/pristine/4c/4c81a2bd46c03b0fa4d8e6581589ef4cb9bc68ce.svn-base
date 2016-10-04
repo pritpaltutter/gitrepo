@@ -1,0 +1,185 @@
+package org.verifone.myapp.dao;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.verifone.myapp.entity.Device;
+import org.verifone.myapp.entity.DeviceType;
+import org.verifone.myapp.entity.Employee;
+import org.verifone.myapp.entity.LabelAndValue;
+
+public class DeviceDaoImpl implements DeviceDao {
+	
+	@Autowired
+	private SessionFactory sessionFactory;
+	
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	@Override
+	public void addDevice(Device device) {
+		
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		session.save(device);
+		
+		session.getTransaction().commit();		
+		System.out.println("device inserted successfully");
+		
+	}
+
+	
+	@Override
+	public List<Device> getAllFreeDevices(Device device) {
+	
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		List<Device> freeDevices =  new ArrayList<Device>();
+		
+		String AllFreeDevicesQuery  = "from Device d where d.isFree = 0"; 
+		Query query = session.createQuery(AllFreeDevicesQuery);
+		
+		if(query.list() != null && !query.list().isEmpty()){
+			freeDevices.addAll(query.list());
+		}
+		
+		/*freeDevices
+		
+		session.save(device);*/
+		
+		session.getTransaction().commit();		
+		System.out.println("device inserted successfully");
+		return freeDevices;
+		
+	}
+
+	@Override
+	public List<LabelAndValue> getAutoCompleteDeviceNames(String deviceName) {
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		String getAllDeviceNameQuery  = "select distinct d.deviceId ,d.deviceName from Device d where d.deviceName like ?"; 
+		Query query = session.createQuery(getAllDeviceNameQuery);
+		query.setParameter(0, "%"+deviceName+"%");
+		List<LabelAndValue> LabelAndValues =  new ArrayList<LabelAndValue>();
+	
+		 
+		if(query.list() != null && !query.list().isEmpty()){
+
+         Iterator it = query.list().iterator();   
+         while(it.hasNext()){
+        	 
+        	 Object deviceIdAndDeviceName[] = (Object[])it.next();
+        	 LabelAndValue	labelAndValue =  new LabelAndValue();
+        	 labelAndValue.setLabel(String.valueOf(deviceIdAndDeviceName[1]));
+        	 labelAndValue.setValue(String.valueOf(deviceIdAndDeviceName[0]));
+        	 LabelAndValues.add(labelAndValue);
+         }
+        
+		}
+		
+		
+		session.getTransaction().commit();		
+		System.out.println(" get All Devices Names with IDs successfully");
+		return LabelAndValues;
+	}
+
+	@Override
+	public String checkDeviceAvailibility(String deviceName) {
+		System.out.println("inside checkDeviceAvailibility dao...");
+		
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		Long numberOfFreedevice = 0L;
+		System.out.println(deviceName);
+		String checkDeviceAvailibilityQuery  = "select count(*) from Device d where d.deviceName=:deviceName and d.free =:isFree"; 
+		
+		Query query = session.createQuery(checkDeviceAvailibilityQuery);
+		query.setParameter("deviceName", deviceName);
+		query.setParameter("isFree", new Boolean(false));
+		
+		if(query.uniqueResult() != null){
+			numberOfFreedevice = (Long) query.uniqueResult();
+		}
+		
+		session.getTransaction().commit();		
+		System.out.println("check Device Availibility done successfully");
+		return String.valueOf(numberOfFreedevice);
+	}
+
+	@Override
+	public void assignDeviceToEmployee(String pkdevice, String pkemployee) {
+		
+        System.out.println("inside assignDeviceToEmployee dao...");
+		
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		Employee employee = (Employee) session.get(Employee.class, new Integer(Integer.valueOf(pkemployee)) );
+		Device device = (Device) session.get(Device.class, new Integer(Integer.valueOf(pkdevice)) );
+		
+		device.setEmployee(employee);
+		device.setFree(false);
+		session.saveOrUpdate(device);
+		
+		session.getTransaction().commit();		
+		System.out.println("assign Device To Employee done successfully");
+	}
+
+	@Override
+	public List<Device> getDevicesToPopulateTable(int currPosition, int pageSize) {
+
+		System.out.println("inside getDevicesToPopulateTable dao...");
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		List<Device> allDevices =  session.createQuery("from Device").setMaxResults(pageSize).setFirstResult(currPosition).list();
+
+		session.getTransaction().commit();		
+		System.out.println("get Devices To Populate Table done successfully");
+		
+		return allDevices;
+	}
+
+	@Override
+	public List<Device> getNumberOfDevicesByCondition(DeviceType deviceType) {
+		System.out.println("inside getNumberOfDevicesByCondition dao...");
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		List<Device> devices = null;
+		
+		switch (deviceType) {
+		case ALL: 
+			devices =  session.createQuery("select d from Device d").list();
+			break;
+		default:
+			devices =  session.createQuery("select d from Device d").list();
+			break;
+		}
+
+		session.getTransaction().commit();		
+		System.out.println("get Devices To Populate by condition done successfully");
+		
+		return devices;
+
+	}
+
+}

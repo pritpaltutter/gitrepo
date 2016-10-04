@@ -1,0 +1,78 @@
+
+.assignDeviceToEmployeeDiv{
+
+   width: 100%%; 
+}
+
+.leftContent{
+	
+   float: left;  
+   width: 50%; 
+	
+}
+
+.rightContent{
+	
+   float: left;  
+   width: 50%; 
+}
+
+.leftContent-userSection{
+	
+   
+   padding-top:10%;
+   padding-left:25%;
+   float: left;  
+   height: 70%;
+   width: 60%; 
+	
+}
+
+.rightContent-deviceSection{
+	
+   
+   padding-top:10%;
+   padding-left:0%;
+   float: left;  
+   height: 70%;
+   width: 35%; 
+}
+
+.rightContent-checkAvailibilitySection{
+	
+   
+   padding-top:14%;
+   padding-left:1%;
+   float: left;  
+   height: 70%;
+   width: 40%; 
+}
+
+.assignButtonDiv{
+	
+	padding-left:30%;
+	float: left;  
+	padding-bottom:10%; 
+    width: 50%
+}
+
+.topContent{
+	
+	height: 40%;
+	
+}
+
+.bottomContent{
+	height: 60%;
+}
+
+.headerText{
+	 padding-left:13%;
+	
+}
+
+.displayNumberOfFreeDevice {
+	
+	  padding-left:30%;
+	  padding-bottom:02%;
+}
