@@ -1,9 +1,0 @@
-.addEmployeeDiv{
-	
-   padding-top:01%;
-   padding-left:01%;
-   padding-left:10%;
-   float: left;  
-   height: 90%;
-   width: 30%; 
-}

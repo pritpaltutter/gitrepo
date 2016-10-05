@@ -1,4 +1,0 @@
-#application defined error messsages
-userName.required=Employee Name is required
-password.required=Employee Password is required
-invalidLogin=Invalid login
